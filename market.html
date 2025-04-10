@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Market Prices - AgriVision</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .filter-container {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 2px solid #a5d6a7;
+      border-radius: 5px;
+      margin: 0.5rem;
+    }
+
+    .card {
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🌾 Market Prices</h1>
+    <p>View real-time crop prices across major Indian cities</p>
+  </header>
+
+  <div class="filter-container">
+    <label for="cityFilter">Filter by City:</label>
+    <select id="cityFilter" onchange="filterData()">
+      <option value="all">All</option>
+    </select>
+
+    <label for="commodityFilter">Filter by Commodity:</label>
+    <select id="commodityFilter" onchange="filterData()">
+      <option value="all">All</option>
+    </select>
+  </div>
+
+  <div class="menu" id="marketCards">
+    <!-- Cards will be injected here -->
+  </div>
+
+  <footer>
+    ⓒ 2025 AgriVision | Empowering Farmers with Insightful Tools
+  </footer>
+
+  <script>
+    const apiUrl = "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=579b464db66ec23bdd000001eea7a16375cd4aee711a0aa5afeb58fd&format=json&limit=100";
+    let allData = [];
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        allData = data.records;
+        populateFilters(allData);
+        displayCards(allData);
+      })
+      .catch(err => console.error("Failed to fetch market data:", err));
+
+    function populateFilters(data) {
+      const citySet = new Set();
+      const commoditySet = new Set();
+
+      data.forEach(item => {
+        citySet.add(item.market);
+        commoditySet.add(item.commodity);
+      });
+
+      const cityDropdown = document.getElementById("cityFilter");
+      const commodityDropdown = document.getElementById("commodityFilter");
+
+      [...citySet].sort().forEach(city => {
+        let option = document.createElement("option");
+        option.value = city;
+        option.textContent = city;
+        cityDropdown.appendChild(option);
+      });
+
+      [...commoditySet].sort().forEach(comm => {
+        let option = document.createElement("option");
+        option.value = comm;
+        option.textContent = comm;
+        commodityDropdown.appendChild(option);
+      });
+    }
+
+    function filterData() {
+      const selectedCity = document.getElementById("cityFilter").value;
+      const selectedCommodity = document.getElementById("commodityFilter").value;
+
+      let filtered = allData.filter(item => {
+        return (selectedCity === "all" || item.market === selectedCity) &&
+               (selectedCommodity === "all" || item.commodity === selectedCommodity);
+      });
+
+      displayCards(filtered);
+    }
+
+    function displayCards(data) {
+      const container = document.getElementById("marketCards");
+      container.innerHTML = ""; // Clear previous cards
+
+      if (data.length === 0) {
+        container.innerHTML = "<p style='text-align:center;'>No results found.</p>";
+        return;
+      }
+
+      data.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>${item.commodity}</h3>
+          <p><strong>Market:</strong> ${item.market}</p>
+          <p><strong>State:</strong> ${item.state}</p>
+          <p><strong>Price:</strong> ₹${item.modal_price}</p>
+          <p><strong>Date:</strong> ${item.arrival_date}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Disease Detection | AgriVision</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>🌿 Crop Disease Detection</h1>
+    <p>Upload a crop image to check for possible diseases</p>
+  </header>
+
+  <main style="text-align: center; padding: 2rem;">
+    <input type="file" id="imageUpload" accept="image/*" />
+    <br/><br/>
+    <button onclick="predictDisease()">Analyze</button>
+    <br/><br/>
+    <div id="result" style="font-size: 1.2rem; color: #2e7d32;"></div>
+    <br/>
+    <a href="index.html">← Back to Home</a>
+  </main>
+
+  <script>
+    function predictDisease() {
+      const diseases = [
+        "Tomato Leaf Blight",
+        "Potato Early Blight",
+        "Maize Leaf Rust",
+        "Healthy - No Disease Detected",
+        "Cotton Bacterial Blight"
+      ];
+      const random = Math.floor(Math.random() * diseases.length);
+      document.getElementById("result").innerHTML =
+        "Prediction: <strong>" + diseases[random] + "</strong>";
+    }
+  </script>
+  <script>
+    document.querySelector("button").addEventListener("click", () => {
+      alert("Analyzing image... Detected: Leaf Blight (Example)");
+    });
+  </script>
+  
+</body>
+</html>
